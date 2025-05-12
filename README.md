@@ -1,3 +1,3 @@
-# pix2pred.github.io
+# pix2pred website
 
-Woohoo for predicate invention!
+Template taken from website for [Differentiable GPU-Parallelized Task and Motion Planning](https://cutamp.github.io) at [this github repo](https://github.com/cutamp/cutamp.github.io).
