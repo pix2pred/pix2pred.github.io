@@ -75,26 +75,26 @@
                     </div>
                 </div>
 
-                <h1 class="title is-1 is-size-2-mobile mt-0">Differentiable GPU-Parallelized<br>Task and Motion Planning</h1>
-                
+                <h1 class="title is-1 is-size-2-mobile mt-0">From Pixels to Predicates:<br>Learning Symbolic World Models via Pretrained Vision-Language Models</h1>
+
                 <div class="author-info">
                     <p class="subtitle">
-                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://shen.nz">William Shen</a><sup>1,2</sup>,</div>
-                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://web.mit.edu/caelan/www/">Caelan Garrett</a><sup>2</sup>,</div>
-                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://nishanthjkumar.com">Nishanth Kumar</a><sup>1,2</sup>,</div>
-                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://imankgoyal.github.io/">Ankit Goyal</a><sup>2</sup>,</div>
-                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://robot-learning.cs.utah.edu/thermans">Tucker Hermans</a><sup>2,3</sup>,</div>
-                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://people.csail.mit.edu/lpk/">Leslie Pack Kaelbling</a><sup>1</sup>,</div>
+                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://ashay.io/">Ashay Athalye</a><sup>*,1,4</sup>,</div>
+                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://nishanthjkumar.com">Nishanth Kumar</a><sup>*,1</sup>,</div>
+                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://tsilver.com">Tom Silver</a><sup>2</sup>,</div>
+                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://yichao-liang.github.io/">Yichao Liang</a><sup>3</sup>,</div>
+                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://www.robo.guru/">Jiuguang Wang</a><sup>4</sup>,</div>
                         <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://people.csail.mit.edu/tlp/">Tomás Lozano-Pérez</a><sup>1</sup>,</div>
-                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://fabioramos.github.io/">Fabio Ramos</a><sup>2,4</sup></div>
+                        <div class="is-inline-block is-size-5"><a class="has-text-weight-semibold" href="https://people.csail.mit.edu/lpk/">Leslie Pack Kaelbling</a><sup>1</sup></div>
                     </p>
                     <p>
                         <div class="is-inline-block"><sup>1</sup><a href="https://www.csail.mit.edu/">MIT CSAIL</a>,</div>
-                        <div class="is-inline-block"><sup>2</sup><a href="https://research.nvidia.com/labs/srl/">NVIDIA Research</a>,</div>
-                        <div class="is-inline-block"><sup>3</sup><a href="https://www.utah.edu/">University of Utah</a>,</div>
-                        <div class="is-inline-block"><sup>4</sup><a href="https://www.sydney.edu.au/">University of Sydney</a></div>
+                        <div class="is-inline-block"><sup>2</sup><a href="https://www.cs.princeton.edu/">Princeton University</a>,</div>
+                        <div class="is-inline-block"><sup>3</sup><a href="https://www.cam.ac.uk/">University of Cambridge</a>,</div>
+                        <div class="is-inline-block"><sup>4</sup><a href="https://rai-inst.com/">Robotics and AI Institute</a></div>
                     </p>
-                </div>
+                    <p class="is-size-7">*Equal contribution</p>
+                </div>                
 
                 <div class="columns is-vcentered mt-1">
                     <div class="column is-narrow">
@@ -122,19 +122,20 @@
                 </div>
                 
                 <div class="video-card">
-                    <video autoplay controls loop muted playsinline alt="Teaser Video">
+                    <video autoplay controls loop muted="muted" muted playsinline alt="Teaser Video">
                         <source src="assets/videos/teaser.mp4" type="video/mp4">
                     </video>
                 </div>
 
                 <h2 id="abstract" class="title is-4 mb-2">Abstract</h2>
                 <p style="font-size: 0.95em">
-                    Planning long-horizon robot manipulation requires making discrete decisions about which objects to interact with and continuous decisions about how to interact with them.
-                    A robot planner must select grasps, placements, and motions that are feasible and safe.
-                    This class of problems falls under Task and Motion Planning (TAMP) and poses significant computational challenges in terms of algorithm runtime and solution quality, particularly when the solution space is highly constrained.
-                    To address these challenges, we propose a new bilevel TAMP algorithm that leverages GPU parallelism to efficiently explore thousands of candidate continuous solutions simultaneously.
-                    Our approach uses GPU parallelism to sample an initial batch of solution seeds for a plan skeleton and to apply differentiable optimization on this batch to satisfy plan constraints and minimize solution cost.
-                    We demonstrate that our algorithm can effectively solve highly constrained problems with non-convex constraints in just seconds, substantially outperforming serial TAMP approaches, and validate our approach on multiple real-world robots.
+                    Our aim is to learn to solve long-horizon decision-making problems in complex robotics domains given low-level skills and a handful of short-horizon demonstrations containing sequences of images.
+                    To this end, we focus on learning abstract symbolic world models that facilitate zero-shot generalization to novel goals via planning. 
+                    A critical component of such models is the set of symbolic <em>predicates</em> that define properties of and relationships between objects.
+                    In this work, we leverage pretrained vision-language models (VLMs) to propose a large set of visual predicates potentially relevant for decision-making, and to evaluate those predicates directly from camera images.
+                    At training time, we pass the proposed predicates and demonstrations into an optimization-based model-learning algorithm to obtain an abstract symbolic world model that is defined in terms of a compact subset of the proposed predicates. 
+                    At test time, given a novel goal in a novel setting, we use the VLM to construct a symbolic description of the current world state, and then use a search-based planning algorithm to find a sequence of low-level skills that achieves the goal. 
+                    We demonstrate empirically across experiments in both simulation and the real world that our method can generalize aggressively, applying its learned world model to solve problems with a wide variety of object types, arrangements, numbers of objects, and visual backgrounds, as well as novel goals and much longer horizons than those seen at training time.
                 </p>
 
                 <hr class="divider">
@@ -143,7 +144,7 @@
                 <img src="assets/cutamp-pipeline.png" alt="cuTAMP Pipeline" data-dark-src="assets/cutamp-pipeline-dark.png" data-light-src="assets/cutamp-pipeline.png">
 
                 <p class="is-size-6">
-                    <b>cuTAMP Overview.</b> cuTAMP frames TAMP as a backtracking bilevel search over plan skeletons. Each
+                    <b>pix2pred Overview.</b> cuTAMP frames TAMP as a backtracking bilevel search over plan skeletons. Each
                     skeleton $\pi$ induces a continuous Constraint Satisfaction Problem that defines the structure of a particle (parameters) and cost
                     functions (constraints and plan costs). These particles are optimized in parallel by evaluating their costs with differentiable
                     cost functions, allowing gradient-based optimizers to iteratively update them towards satisfying solutions.
@@ -276,12 +277,12 @@
                 <!-- Citation section -->
                 <h3 class="title is-4">Citation</h3>
                 <div class="is-relative">
-                    <pre class="textarea is-family-code" readonly id="citation-text">@article{shen2024cutamp,
-    title={Differentiable GPU-Parallelized Task and Motion Planning},
-    author={Shen, William and Garrett, Caelan and Kumar, Nishanth and Goyal, Ankit and Hermans, Tucker and Kaelbling, Leslie Pack and Lozano-P{\'e}rez, Tom{\'a}s and Ramos, Fabio},
-    journal={arXiv preprint arXiv:2411.11833},
-    year={2024}
-}</pre>
+                    <pre class="textarea is-family-code" readonly id="citation-text">@inproceedings{athalye2025pix2pred,
+title={From Pixels to Predicates: Learning Symbolic World Models via Pretrained Vision-Language Models},
+author={Athalye, Ashay and Kumar, Nishanth and Silver, Tom and Liang, Yichao and Wang, Jiuguang and Lozano-P{\'e}rez, Tom{\'a}s and Kaelbling, Leslie Pack},
+booktitle={Proceedings of the Conference on Robot Learning (CoRL)},
+year={2025},
+note={To appear}}</pre>
                     <button id="citation-copy-button" class="button is-small" onclick="copyCitation()">
                         <span class="icon">
                             <i class="fas fa-copy"></i>
