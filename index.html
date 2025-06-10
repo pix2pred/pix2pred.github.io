@@ -4,7 +4,7 @@
     <base target="_blank">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="assets/tetris-icon.png">
+    <link rel="icon" href="assets/spot-kitchen-juicing.png">
     <title>From Pixels to Predicates: Learning Symbolic World Models via Pretrained Vision-Language Models</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="style.css">
@@ -105,18 +105,18 @@
                             <span>Paper</span>
                         </a> -->
 
-                        <a href="https://arxiv.org/abs/2411.11833" class="button is-size-5 mr-1 mt-2">
+                        <a href="https://arxiv.org/abs/2501.00296" class="button is-size-5 mr-1 mt-2">
                             <span class="icon">
                                 <i class="ai ai-arxiv"></i>
                             </span>
                             <span>arXiv</span>
                         </a>
 
-                        <a class="button is-size-5 mr-1 mt-2" disabled>
+                        <a href="https://github.com/Learning-and-Intelligent-Systems/predicators/releases/tag/pix2pred-april2025" class="button is-size-5 mr-1 mt-2">
                             <span class="icon">
                                 <i class="fas fa-code"></i>
                             </span>
-                            <span>Code (coming soon)</span>
+                            <span>Code</span>
                         </a>
                     </div>
                 </div>
@@ -141,56 +141,54 @@
                 <hr class="divider">
 
                 <h2 id="method" class="title is-3">Method</h2>
-                <img src="assets/cutamp-pipeline.png" alt="cuTAMP Pipeline" data-dark-src="assets/cutamp-pipeline-dark.png" data-light-src="assets/cutamp-pipeline.png">
+                <img src="assets/pix2pred-pipeline.png" alt="pix2pred Pipeline" data-dark-src="assets/pix2pred-pipeline.png" data-light-src="assets/pix2pred-pipeline.png">
 
                 <p class="is-size-6">
-                    <b>pix2pred Overview.</b> cuTAMP frames TAMP as a backtracking bilevel search over plan skeletons. Each
-                    skeleton $\pi$ induces a continuous Constraint Satisfaction Problem that defines the structure of a particle (parameters) and cost
-                    functions (constraints and plan costs). These particles are optimized in parallel by evaluating their costs with differentiable
-                    cost functions, allowing gradient-based optimizers to iteratively update them towards satisfying solutions.
+                    <b>pix2pred Overview.</b> Given a set of demonstrations - potentially from a different embodiment - showcasing the effects of distinct skills (e.g., wiping, dumping) and a small initial predicate set, 
+                    pix2pred invents new predicates (e.g., NoObjectsOnTop(?table)) and learns symbolic operators. At test time, it plans over these to solve a novel multi-step task in a visually distinct environment
+                    (e.g., retrieving an eraser from a bin, clearing an obstacle, wiping the table, and returning the eraser).
                 </p>
 
-                <h2 id="tetris" class="title is-3">Solving Highly-Constrained Problems</h2>
+                <h2 id="tetris" class="title is-3">Results</h2>
                 <p>
-                    In the Tetris domain, the robot's objective is to pack 5 blocks with non-convex shapes somewhere in a tight goal region.
-                    This problem requires reasoning about spatial arrangements, as the shapes will only fit if they are arranged in particular configuration modes.
+                    TODO: show graph and explain what we can learn/conclude from this.
                 </p>
+
+                <h2 id="learning-irl" class="title is-3">Learning from Real-World Data</h2>
+                <h3 id="cleanup" class="title is-4">Cleanup</h3>
                 <p>
-                    We optimize for placement poses, parametrized as <b>continuous</b> 4-DOF actions with positions $(x, y, z)$ and yaw angles $\theta$, along with their associated 7-DOF robot joint positions.
-                    Each particle is 90-dimensional (ten 7-DOF arm configurations and five 4-DOF placement poses).
-                    We sample a fixed set of grasps and use an off-the-shelf motion planner (<a href="https://curobo.org/">cuRobo</a>) to solve for the full trajectories.
+                    TODO: show predicates and operators from cleanup; show cleanup working in variety of envs.
                 </p>
                 <div class="columns is-multiline">
                     <div class="column is-half">
                         <div class="video-card">
-                            <video autoplay controls loop muted playsinline alt="Tetris Optimization">
-                                <source src="assets/videos/tetris-optimization.mp4" type="video/mp4">
-                            </video>
+                            <img src="assets/min-goal-dist.png" alt="Goal Cost Optimization" data-dark-src="assets/min-goal-dist-dark.png" data-light-src="assets/min-goal-dist.png">
                             <div class="video-card-content">
-                                <div class="video-title">Optimization Visualization</div>
-                                <p>We visualize the placement poses corresponding to the best particle as optimization progress.</p>
+                                <div class="video-title">Minimizing Distance between Objects</div>
+                                <p>
+                                    We compare the final state after executing the best particle.
+                                    (a) cuTAMP achieves significantly lower cost compared to (b) parallelized sampling which performs no optimization.
+                                </p>
                             </div>
                         </div>
                     </div>
                     <div class="column is-half">
                         <div class="video-card">
-                            <video autoplay controls loop muted playsinline alt="Tetris Execution">
-                                <source src="assets/videos/tetris-execution-2x.mp4" type="video/mp4">
+                            <video autoplay controls loop muted playsinline alt="Minimizing y-position of objects">
+                                <source src="assets/videos/rummy-min-y.mp4" type="video/mp4">
                             </video>
                             <div class="video-card-content">
-                                <div class="video-title">TAMP Plan Execution</div>
+                                <div class="video-title">Minimizing $y$-position of objects</div>
                                 <p>
-                                    We show the full execution of the TAMP plan for the best particle. cuTAMP optimizes for a solution in just seconds.
+                                    We minimize the $y$-position of three cubes on a real Kinova Gen3 robot. 
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <h2 id="goal-costs" class="title is-3">Optimizing Goal Costs</h2>
+                <h3 id="juicing" class="title is-4">Juice</h3>
                 <p>
-                    <b>cuTAMP</b> supports optimizing plan costs. We consider placing four objects into a large goal region and set a goal cost to minimize the distance between the objects in the final state.
-                    Our results demonstrate the clear benefit of combining sampling with differentiable optimization for substantially reducing the goal cost.
+                    TODO: show predicates and operators from juice; show juice working in variety of envs.
                 </p>
                 <div class="columns is-multiline">
                     <div class="column is-half">
@@ -220,7 +218,7 @@
                     </div>
                 </div>
 
-                <h2 id="skeleton-search" class="title is-3">Efficiently Searching over Plan Skeletons</h2>
+                <!-- <h2 id="skeleton-search" class="title is-3">Efficiently Searching over Plan Skeletons</h2>
                 <p>
                     To efficiently guide the discrete search over plan skeletons and avoid optimizing unsolvable ones, we exploit parallelized constraint sampling from particle initialization to derive a <b>plan feasibility heuristic</b>.
                     cuTAMP prioritizes skeletons for refinement based on their estimated feasibility, focusing our computational effort on those most likely to admit solutions.
@@ -272,7 +270,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Citation section -->
                 <h3 class="title is-4">Citation</h3>
