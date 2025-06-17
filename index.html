@@ -151,136 +151,266 @@
 
                 <h2 id="tetris" class="title is-3">Results</h2>
                 <p>
-                    TODO: show graph and explain what we can learn/conclude from this.
+                    <img src="assets/pix2pred-results.png" alt="Experimental Results" data-dark-src="assets/pix2pred-results.png" data-light-src="assets/pix2pred-results.png">
+                    Across a variety of tasks in simulated environments, ranging from 2D gridworld tasks to full 3D simulation of a coffee-making task, we find that pix2pred learns predicates and operators that enable it to 
+                    generalize to novel situations never seen at training time.
+                    For instance, in the simple burger-making environment, our approach is able to learn predicates corresponding to whether or not a patty is cooked, and whether or not lettuce is chopped from just 10 demonstrations of individually making burgers with just lettuce, just cheese, or just a patty.
+                    Using these learned predicates and corresponding learned operators, it is able to generalize zero-shot to making burgers with a combination of all these ingredients.
+                </p>
+                <p>
+                    Importantly, we find that pix2pred generalizes substantially better than a 'model-free' approach that simply prompts a VLM to plan directly to solve test-tasks using the demonstrations as in-context examples (ViLA fewshot).
+                    We observe that the VLM by itself tends to 'pattern match' from the demonstrations. For instance it is unable to solve testing tasks in the burger domain where the agent starts out holding an object that must be put down first (since the agent's hands are full!).
+                    This is because none of the demonstrations start out with the agent holding any objects and thus the VLM has never seen such a situation before.
+                    By contrast, our approach learns a 'HandEmpty()' predicate and leverages this to find the correct plan.
+                    This suggests that learning a world model and then planning with it can enable much better generalization, from extremely small amounts of data, compared to a pure model-free approach.
                 </p>
 
                 <h2 id="learning-irl" class="title is-3">Learning from Real-World Data</h2>
                 <h3 id="cleanup" class="title is-4">Cleanup</h3>
                 <p>
-                    TODO: show predicates and operators from cleanup; show cleanup working in variety of envs.
+                    pix2pred learns to solve a cleanup task from just 6 real-world egocentric human demonstrations. It is then able to solve never-before-seen variants of this task (such as where it must obtain an eraser by first dumping it out of a bucket!) in novel settings with entirely differnet objects and visual backgrounds.
                 </p>
+
+                <details class="tcolorbox">
+                    <summary class="tcolorbox-title">
+                    Learned predicates and learned action models in Cleanup (click me!)
+                    </summary>
+                    <pre class="code-block">
+Learned predicates:
+IsOnFloor0
+IsEraser0
+Holding0
+NoObjectsOnTop1
+IsOn0
+HandEmpty0
+
+Learned operators:
+STRIPS-Op0:
+    Parameters: [?x0:movable_object, ?x1:table, ?x2:robot]
+    Preconditions: [HandEmpty0(?x2:robot), IsOn0(?x0:movable_object, ?x1:table)]
+    Add Effects: [Holding0(?x2:robot, ?x0:movable_object), NoObjectsOnTop1(?x1:table)]
+    Delete Effects: [HandEmpty0(?x2:robot), IsOn0(?x0:movable_object, ?x1:table)]
+    Ignore Effects: []
+    Skill: PickFromTop(?x2:robot, ?x0:movable_object, ?x1:table)
+
+STRIPS-Op1:
+    Parameters: [?x0:movable_object, ?x1:robot, ?x2:trash_can]
+    Preconditions: [Holding0(?x1:robot, ?x0:movable_object)]
+    Add Effects: [HandEmpty0(?x1:robot), InsideContainer(?x0:movable_object, ?x2:trash_can)]
+    Delete Effects: [Holding0(?x1:robot, ?x0:movable_object)]
+    Ignore Effects: []
+    Skill: PlaceInside(?x1:robot, ?x0:movable_object, ?x2:trash_can)
+
+STRIPS-Op2:
+    Parameters: [?x0:movable_object, ?x1:robot]
+    Preconditions: [HandEmpty0(?x1:robot), IsOnFloor0(?x0:movable_object)]
+    Add Effects: [Holding0(?x1:robot, ?x0:movable_object)]
+    Delete Effects: [HandEmpty0(?x1:robot), IsOnFloor0(?x0:movable_object)]
+    Ignore Effects: []
+    Skill: PickFromFloor(?x1:robot, ?x0:movable_object)
+
+STRIPS-Op3:
+    Parameters: [?x0:table, ?x1:movable_object, ?x2:robot]
+    Preconditions: [Holding0(?x2:robot, ?x1:movable_object), IsEraser0(?x1:movable_object), NoObjectsOnTop1(?x0:table)]
+    Add Effects: [WipedOfMarkerScribbles(?x0:table)]
+    Delete Effects: []
+    Ignore Effects: []
+    Skill: WipeAndContinueHoldingEraser(?x2:robot, ?x1:movable_object, ?x0:table)
+
+STRIPS-Op7:
+    Parameters: [?x0:movable_object, ?x1:robot, ?x2:trash_can]
+    Preconditions: [HandEmpty0(?x1:robot), InsideContainer(?x0:movable_object, ?x2:trash_can)]
+    Add Effects: [IsOnFloor0(?x0:movable_object)]
+    Delete Effects: [InsideContainer(?x0:movable_object, ?x2:trash_can)]
+    Ignore Effects: []
+    Skill: DumpContentsOntoFloor(?x1:robot, ?x2:trash_can)
+            </pre>
+            </details>                
                 <div class="columns is-multiline">
                     <div class="column is-half">
                         <div class="video-card">
-                            <img src="assets/min-goal-dist.png" alt="Goal Cost Optimization" data-dark-src="assets/min-goal-dist-dark.png" data-light-src="assets/min-goal-dist.png">
+                            <video autoplay controls loop muted playsinline alt="Cleanup task in demonstration environment">
+                                <source src="assets/videos/ours-demo-room-down.mp4" type="video/mp4">
+                            </video>
                             <div class="video-card-content">
-                                <div class="video-title">Minimizing Distance between Objects</div>
+                                <div class="video-title">Cleanup in the demonstration room</div>
                                 <p>
-                                    We compare the final state after executing the best particle.
-                                    (a) cuTAMP achieves significantly lower cost compared to (b) parallelized sampling which performs no optimization.
+                                    pix2pred is able to achieve the goal of wiping the table, but with different objects in the same room as the egocentric human demonstrations.
                                 </p>
                             </div>
                         </div>
                     </div>
                     <div class="column is-half">
                         <div class="video-card">
-                            <video autoplay controls loop muted playsinline alt="Minimizing y-position of objects">
-                                <source src="assets/videos/rummy-min-y.mp4" type="video/mp4">
+                            <video autoplay controls loop muted playsinline alt="Cleanup task in complex environment">
+                                <source src="assets/videos/ours-bcs-room-down.mp4" type="video/mp4">
                             </video>
                             <div class="video-card-content">
-                                <div class="video-title">Minimizing $y$-position of objects</div>
+                                <div class="video-title">Cleanup in a previously-unseen room</div>
                                 <p>
-                                    We minimize the $y$-position of three cubes on a real Kinova Gen3 robot. 
+                                    pix2pred achieves the goal of wiping the table and putting the eraser back into the clear plastic bin in a completely new room that the agent has no demonstrations from.
                                 </p>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-half">
+                      <div class="video-card">
+                        <video autoplay controls loop muted playsinline alt="Additional demo">
+                          <source src="assets/videos/ours-gremlin-bcs-down.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-card-content">
+                          <div class="video-title">Cleanup with a gremlin</div>
+                          <p>
+                            The learned predicates and operators enable pix2pred to recover from adversarial interventions that occur at runtime.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                 </div>
                 <h3 id="juicing" class="title is-4">Juice</h3>
                 <p>
-                    TODO: show predicates and operators from juice; show juice working in variety of envs.
+                    pix2pred learns to operate a cold-press juicer from 10 real-world egocentric human demonstrations! Similar to in the Cleanup environment, it is able to perform novel variants of the task in completely new surroundings.
                 </p>
+
+                <details class="tcolorbox">
+                    <summary class="tcolorbox-title">
+                    Learned predicates and learned action models in Juice (click me!)
+                    </summary>
+                    <pre class="code-block">
+Learned predicates:
+IsCup0
+NearJuiceValve0
+InsideWasteValveRegion0
+HoldingContainer0
+OutsideJuiceMachine0
+LidClosed0
+HoldingObj0
+Functional0
+JuiceMachineOpen0
+IsPlastic0
+HandEmpty0
+HasContents0
+
+Learned operators:
+STRIPS-Op0:
+Parameters: [?x0:robot, ?x1:juicer]
+Preconditions: [Functional0(?x1:juicer), HandEmpty0(?x0:robot), JuiceMachineOpen0(?x1:juicer)]
+Add Effects: [LidClosed0(?x1:juicer)]
+Delete Effects: [JuiceMachineOpen0(?x1:juicer)]
+Ignore Effects: []
+Skill: CloseLid(?x0:robot, ?x1:juicer)
+
+STRIPS-Op1:
+Parameters: [?x0:robot, ?x1:container]
+Preconditions: [HandEmpty0(?x0:robot), IsCup0(?x1:container)]
+Add Effects: [HoldingContainer0(?x0:robot, ?x1:container)]
+Delete Effects: [HandEmpty0(?x0:robot)]
+Ignore Effects: []
+Skill: PickContainer(?x0:robot, ?x1:container)
+
+STRIPS-Op2:
+Parameters: [?x0:robot, ?x1:juicer, ?x2:container]
+Preconditions: [Empty(?x2:container), Functional0(?x1:juicer), HoldingContainer0(?x0:robot, ?x2:container), IsCup0(?x2:container), LidClosed0(?x1:juicer)]
+Add Effects: [HandEmpty0(?x0:robot), NearJuiceValve0(?x2:container, ?x1:juicer)]
+Delete Effects: [HoldingContainer0(?x0:robot, ?x2:container)]
+Ignore Effects: []
+Skill: PlaceInsideJuiceValveRegion(?x0:robot, ?x2:container, ?x1:juicer)
+
+STRIPS-Op5:
+Parameters: [?x0:robot, ?x1:juicer, ?x2:container]
+Preconditions: [Empty(?x2:container), Functional0(?x1:juicer), HoldingContainer0(?x0:robot, ?x2:container), IsCup0(?x2:container), IsPlastic0(?x2:container)]
+Add Effects: [HandEmpty0(?x0:robot), InsideWasteValveRegion0(?x2:container, ?x1:juicer)]
+Delete Effects: [HoldingContainer0(?x0:robot, ?x2:container)]
+Ignore Effects: []
+Skill: PlaceInsideWasteValveRegion(?x0:robot, ?x2:container, ?x1:juicer)
+
+STRIPS-Op7:
+Parameters: [?x0:container, ?x1:container, ?x2:robot]
+Preconditions: [Empty(?x0:container), HasContents0(?x1:container), HoldingContainer0(?x2:robot, ?x1:container), IsCup0(?x1:container), IsPlastic0(?x1:container)]
+Add Effects: [Empty(?x1:container), HasContents0(?x0:container)]
+Delete Effects: [Empty(?x0:container), HasContents0(?x1:container)]
+Ignore Effects: []
+Skill: DumpFromOneIntoOther(?x2:robot, ?x1:container, ?x0:container)
+
+STRIPS-Op10:
+Parameters: [?x0:container, ?x1:container, ?x2:robot, ?x3:juicer, ?x4:movable_object]
+Preconditions: [Empty(?x0:container), Empty(?x1:container), Functional0(?x3:juicer), HandEmpty0(?x2:robot), Inside(?x4:movable_object, ?x3:juicer), InsideWasteValveRegion0(?x1:container, ?x3:juicer), IsCup0(?x0:container), IsCup0(?x1:container), IsPlastic0(?x1:container), LidClosed0(?x3:juicer), NearJuiceValve0(?x0:container, ?x3:juicer)]
+Add Effects: [HasContents0(?x0:container), HasContents0(?x1:container), JuiceInCup(?x4:movable_object, ?x0:container), OutsideJuiceMachine0(?x4:movable_object)]
+Delete Effects: [Empty(?x0:container), Empty(?x1:container), Inside(?x4:movable_object, ?x3:juicer)]
+Ignore Effects: []
+Skill: TurnOnAndRunMachine(?x2:robot, ?x3:juicer, ?x0:container, ?x1:container)
+
+STRIPS-Op11:
+Parameters: [?x0:robot, ?x1:movable_object]
+Preconditions: [HandEmpty0(?x0:robot), OutsideJuiceMachine0(?x1:movable_object)]
+Add Effects: [HoldingObj0(?x0:robot, ?x1:movable_object)]
+Delete Effects: [HandEmpty0(?x0:robot)]
+Ignore Effects: []
+Skill: PickMovable(?x0:robot, ?x1:movable_object)
+
+STRIPS-Op12:
+Parameters: [?x0:robot, ?x1:juicer, ?x2:movable_object]
+Preconditions: [HoldingObj0(?x0:robot, ?x2:movable_object), JuiceMachineOpen0(?x1:juicer), OutsideJuiceMachine0(?x2:movable_object)]
+Add Effects: [HandEmpty0(?x0:robot), Inside(?x2:movable_object, ?x1:juicer)]
+Delete Effects: [HoldingObj0(?x0:robot, ?x2:movable_object), OutsideJuiceMachine0(?x2:movable_object)]
+Ignore Effects: []
+Skill: PlaceInside(?x0:robot, ?x2:movable_object, ?x1:juicer)
+                </pre>
+                </details> 
                 <div class="columns is-multiline">
                     <div class="column is-half">
                         <div class="video-card">
-                            <img src="assets/min-goal-dist.png" alt="Goal Cost Optimization" data-dark-src="assets/min-goal-dist-dark.png" data-light-src="assets/min-goal-dist.png">
+                            <video autoplay controls loop muted playsinline alt="Cleanup task in demonstration environment">
+                                <source src="assets/videos/ours-juicing-demo-room-down.mp4" type="video/mp4">
+                            </video>
                             <div class="video-card-content">
-                                <div class="video-title">Minimizing Distance between Objects</div>
+                                <div class="video-title">Juicing in the demonstration room</div>
                                 <p>
-                                    We compare the final state after executing the best particle.
-                                    (a) cuTAMP achieves significantly lower cost compared to (b) parallelized sampling which performs no optimization.
+                                    pix2pred achieves the goal of making orange juice in the same room as the demonstrations.
                                 </p>
                             </div>
                         </div>
                     </div>
                     <div class="column is-half">
                         <div class="video-card">
-                            <video autoplay controls loop muted playsinline alt="Minimizing y-position of objects">
-                                <source src="assets/videos/rummy-min-y.mp4" type="video/mp4">
+                            <video autoplay controls loop muted playsinline alt="Cleanup task in complex environment">
+                                <source src="assets/videos/ours-stata-kitchen-down.mp4" type="video/mp4">
                             </video>
                             <div class="video-card-content">
-                                <div class="video-title">Minimizing $y$-position of objects</div>
+                                <div class="video-title">Juicing in a previously-unseen room</div>
                                 <p>
-                                    We minimize the $y$-position of three cubes on a real Kinova Gen3 robot. 
+                                    pix2pred achieves the goal of making juice using a never-before-seen fruit (a pear) in a previously unseen kitchen.
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- <h2 id="skeleton-search" class="title is-3">Efficiently Searching over Plan Skeletons</h2>
-                <p>
-                    To efficiently guide the discrete search over plan skeletons and avoid optimizing unsolvable ones, we exploit parallelized constraint sampling from particle initialization to derive a <b>plan feasibility heuristic</b>.
-                    cuTAMP prioritizes skeletons for refinement based on their estimated feasibility, focusing our computational effort on those most likely to admit solutions.
-                </p>
-                <p>
-                    In Stick Button, the robot must press the red, green, and blue buttons using either its fingers or a stick as a tool.
-                    Due to the kinematic limitations of the Franka, the robot must use the stick to press the blue and green buttons, as they are out of direct reach.
-                    This results in a large number of plan skeletons that are infeasible or have extraneous actions.
-                    The best configuration of cuTAMP solves this problem in under 1.5 seconds.
-                </p>
-                <div class="columns is-multiline">
+                <div class="columns is-centered">
                     <div class="column is-half">
-                        <div class="video-card">
-                            <img src="assets/stick-button-rollout.png" alt="Stick Button Rollout" data-dark-src="assets/stick-button-rollout-dark.png" data-light-src="assets/stick-button-rollout.png">
-                            <div class="video-card-content">
-                                <div class="video-title">Cross-Embodiment Generalization</div>
-                                <p>
-                                    The blue button is beyond the reach of the Franka, requiring it to use the stick as a tool.
-                                    In contrast, the UR5 can directly reach the button.
-                                </p>
-                            </div>
+                      <div class="video-card">
+                        <video autoplay controls loop muted playsinline alt="Additional demo">
+                          <source src="assets/videos/ours-gremlin-juice-down.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-card-content">
+                          <div class="video-title">Thanks for watching!</div>
                         </div>
+                      </div>
                     </div>
-                    <div class="column">
-                        <div class="video-card">
-                            <video autoplay controls loop muted playsinline alt="Video">
-                                <source src="assets/videos/rummy-obstruction.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-card-content">
-                                <div class="video-title">Stack Red Block 🟥 on Blue Block 🟦</div>
-                                <p>
-                                    The Mustard Bottle and Canister are obstructing the placement.
-                                    cuTAMP reasons to move these objects out of the way first, before stacking the blocks.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column is-full">
-                        <div class="video-card">
-                            <video autoplay controls loop muted playsinline alt="Video">
-                                <source src="assets/videos/ur5-fruit-packing.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-card-content">
-                                <div class="video-title">Pack the Fruit on the White Cube</div>
-                                <p>
-                                    The strawberry 🍓 is obstructed by Lego blocks on all four sides, requiring at least two blocks to be moved out of the way.
-                                    This task requires more planning time as there are many more skeletons to be considered (there are 5698 skeletons in total).
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
+                </div>
 
                 <!-- Citation section -->
                 <h3 class="title is-4">Citation</h3>
                 <div class="is-relative">
-                    <pre class="textarea is-family-code" readonly id="citation-text">@inproceedings{athalye2025pix2pred,
-title={From Pixels to Predicates: Learning Symbolic World Models via Pretrained Vision-Language Models},
-author={Athalye, Ashay and Kumar, Nishanth and Silver, Tom and Liang, Yichao and Wang, Jiuguang and Lozano-P{\'e}rez, Tom{\'a}s and Kaelbling, Leslie Pack},
-booktitle={Proceedings of the Conference on Robot Learning (CoRL)},
+                    <pre class="textarea is-family-code" readonly id="citation-text">@misc{athalye2025pixelspredicateslearningsymbolic,
+title={From Pixels to Predicates: Learning Symbolic World Models via Pretrained Vision-Language Models}, 
+author={Ashay Athalye and Nishanth Kumar and Tom Silver and Yichao Liang and Jiuguang Wang and Tomás Lozano-Pérez and Leslie Pack Kaelbling},
 year={2025},
-note={To appear}}</pre>
+eprint={2501.00296},
+archivePrefix={arXiv},
+primaryClass={cs.RO},
+url={https://arxiv.org/abs/2501.00296}}</pre>
                     <button id="citation-copy-button" class="button is-small" onclick="copyCitation()">
                         <span class="icon">
                             <i class="fas fa-copy"></i>
@@ -302,7 +432,7 @@ note={To appear}}</pre>
                     </div>
                     <div class="level-right">
                         <div class="level-item">
-                            <p class="has-text-weight-light">Updated April 2025</p>
+                            <p class="has-text-weight-light">Updated June 2025</p>
                         </div>
                     </div>
                 </div>

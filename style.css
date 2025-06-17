@@ -271,3 +271,66 @@ a:hover {
     background-color: #4a4a4a;
     color: #f5f5f5;
 }
+
+.tcolorbox summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 0.5em 0;
+    outline: none;
+  }
+  
+  .tcolorbox[open] .tcolorbox-title {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.4em;
+  }
+  
+  .tcolorbox {
+    background-color: var(--card-background);
+    border: 1px solid var(--text);
+    border-left: 5px solid var(--text);
+    border-radius: 0 0 0 10px;
+    padding: 1em;
+    margin: 1.5em 0;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .tcolorbox-title {
+    font-weight: bold;
+    font-size: 1em;
+    color: var(--text);
+  }
+  
+  /* Optional: Add a disclosure triangle */
+  .tcolorbox summary::marker {
+    content: "▶ ";
+    color: var(--text);
+  }
+  
+  .tcolorbox[open] summary::marker {
+    content: "▼ ";
+  }
+  
+  .code-block {
+    background-color: var(--background);
+    padding: 1em;
+    font-size: 0.9em;
+    line-height: 1.4em;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: var(--text);
+  }
+  
+  [data-theme="dark"] .code-block {
+    background-color: #1f1f1f;
+  }
+  
+  [data-theme="dark"] .tcolorbox {
+    border-color: var(--border);
+    border-left-color: var(--text);
+  }
+  
