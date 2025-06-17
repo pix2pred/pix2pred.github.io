@@ -66,10 +66,12 @@
                                 Table of Contents
                             </p>
                             <ul class="menu-list">
+                                <li><a href="#abstract" target="_self">Abstract</a></li>
                                 <li><a href="#method" target="_self">Method</a></li>
-                                <li><a href="#tetris" target="_self">Solving Highly-Constrained Problems</a></li>
-                                <li><a href="#goal-costs" target="_self">Optimizing Goal Costs</a></li>
-                                <li><a href="#skeleton-search" target="_self">Efficiently Searching over Plan Skeletons</a></li>
+                                <li><a href="#results" target="_self">Results</a></li>
+                                <li><a href="#cleanup" target="_self">Learning from Real World Data: Cleanup</a></li>
+                                <li><a href="#juicing" target="_self">Learning from Real World Data: Juice</a></li>
+                                <li><a href="#citation" target="_self">Citation</a></li>
                             </ul>
                         </aside>
                     </div>
@@ -149,7 +151,7 @@
                     (e.g., retrieving an eraser from a bin, clearing an obstacle, wiping the table, and returning the eraser).
                 </p>
 
-                <h2 id="tetris" class="title is-3">Results</h2>
+                <h2 id="results" class="title is-3">Results</h2>
                 <p>
                     <img src="assets/pix2pred-results.png" alt="Experimental Results" data-dark-src="assets/pix2pred-results.png" data-light-src="assets/pix2pred-results.png">
                     Across a variety of tasks in simulated environments, ranging from 2D gridworld tasks to full 3D simulation of a coffee-making task, we find that pix2pred learns predicates and operators that enable it to 
@@ -401,7 +403,7 @@ Skill: PlaceInside(?x0:robot, ?x2:movable_object, ?x1:juicer)
                 </div>
 
                 <!-- Citation section -->
-                <h3 class="title is-4">Citation</h3>
+                <h3 id="citation" class="title is-4">Citation</h3>
                 <div class="is-relative">
                     <pre class="textarea is-family-code" readonly id="citation-text">@misc{athalye2025pixelspredicateslearningsymbolic,
 title={From Pixels to Predicates: Learning Symbolic World Models via Pretrained Vision-Language Models}, 
